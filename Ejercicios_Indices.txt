@@ -1,0 +1,140 @@
+#### Indices en MongoDB ###
+
+-- 1
+
+-- Inserción de Documentos de Ejemplo en la colección "orders":
+
+db.orders.insertOne({
+    "orderId": "ORD1001",
+    "customerId": "CUST001",
+    "orderDate": ISODate("2024-09-01T14:23:00Z"),
+    "items": [
+        {
+            "productId": "PROD001",
+            "quantity": 2,
+            "price": 19.99
+        },
+        {
+            "productId": "PROD002",
+            "quantity": 1,
+            "price": 39.99
+        }
+    ],
+    "totalAmount": 79.97,
+    "status": "processing"
+});
+
+db.orders.insertOne({
+    "orderId": "ORD1002",
+    "customerId": "CUST002",
+    "orderDate": ISODate("2024-09-03T09:15:00Z"),
+    "items": [
+        {
+            "productId": "PROD003",
+            "quantity": 3,
+            "price": 9.99
+        },
+        {
+            "productId": "PROD004",
+            "quantity": 1,
+            "price": 29.99
+        }
+    ],
+    "totalAmount": 59.96,
+    "status": "shipped"
+});
+
+-- Consultas a evaluar
+
+-- 1. Recupera todos los pedidos realizados por el cliente con customerId "CUST001":
+
+db.orders.find({ "customerId": "CUST001" })
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ customerId:1 });
+
+-- 2. Recupera todos los pedidos, ordenados por la fecha de pedido en orden descendente (más reciente primero).
+
+db.orders.find().sort({ "orderDate": -1 })
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ orderDate:-1 });
+
+
+-- 3. Filtra todos los pedidos que tienen el estado "shipped".
+
+db.orders.find({ "status": "shipped" })
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ status: 1 });
+
+-- 4. Encuentra todos los pedidos que contienen el producto con productId "PROD001" en su lista de items.
+
+db.orders.find({ "items.productId": "PROD001" })
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ "items.productId": 1 });
+
+-- 5 Recupera todos los pedidos realizados en septiembre de 2024 con un monto total superior a $50.
+
+db.orders.find({
+    "orderDate": { $gte: ISODate("2024-09-01T00:00:00Z"), $lte: ISODate("2024-09-30T23:59:59Z") },
+    "totalAmount": { $gt: 50 }
+})
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ totalAmount: -1, orderDate: -1 });
+
+
+-- 6 Recupera todos los pedidos de un cliente específico que tengan un estado determinado.
+
+db.orders.find({
+    "customerId": "CUST001",
+    "status": "shipped"
+})
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ customerId: 1, status: 1 });
+
+-- 7 Recupera las ventas de un producto en un rango de fechas específico.
+
+db.sales.find({
+    "productId": "PROD123",
+    "saleDate": { $gte: ISODate("2024-01-01T00:00:00Z"), $lte: ISODate("2024-12-31T23:59:59Z") }
+})
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ customerId: 1, status: 1 });
+
+-- 8 Recupera todos los pedidos de un cliente en un rango de fechas específico.
+
+db.orders.find({
+    "customerId": "CUST003",
+    "orderDate": { $gte: ISODate("2024-08-01T00:00:00Z"), $lte: ISODate("2024-08-31T23:59:59Z") }
+}).explain("executionStats");
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ customerId: 1, orderDate: 1 });
+
+-- 9 Recupera todos los pedidos que tienen un monto total superior a $100 y que fueron realizados por un cliente específico.
+
+db.orders.find({
+    "customerId": "CUST002",
+    "totalAmount": { $gt: 100 }
+}).explain();
+
+
+-- Indice Propuesto:
+
+db.orders.createIndex({ customerId: 1, totalAmount: -1 });
+
+
+
