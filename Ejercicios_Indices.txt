@@ -138,3 +138,36 @@ db.orders.createIndex({ customerId: 1, totalAmount: -1 });
 
 
 
+-- Casuística: Cuando se crea un indice por un campo específico y hay documentos que no poseen ese campo, también podrían ser indexados, lo que afectara el rendimiento.
+
+Ej:
+--------------------------------------------------------------
+> db.coleccion.insert({"nombre": "cesar"})
+> db.coleccion.insert({"nombre": "diego", "edad": "35"})
+> db.coleccion.createIndex({"edad" : 1})
+--------------------------------------------------------------
+
+Para indexar un campo que no va a estar presente en todos los documentos de la colección, se puede hacer uso de "sparse" para que omita cualquier documento que no contenga el campo
+indexado, y luego indicarselo explicitamente mediante "hint" para asegurar de que se indexe por el índice correcto:
+
+--------------------------------------------------------------
+> db.coleccion.createIndex({"edad" : 1}, {sparse: true})
+--------------------------------------------------------------
+--------------------------------------------------------------
+> db.coleccion.find().sort({"edad": -1}).hint({"edad": 1})
+--------------------------------------------------------------
+
+De este modo se indexarian solo los documentos que se corresponden con el campo creado en el índice:
+
+-- Resultado de la query:
+--------------------------------------------------------------------------------------
+"{ "_id" : ObjectId("56e8401b010d418cf416c326"), "nombre" : "diego", "edad" : "35" }"
+--------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
