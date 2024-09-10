@@ -192,6 +192,7 @@ db.productos.createIndex({categoria: 1, marca: 1, precio: 1, stock: 1, ventas: -
 #    Indices Multiclave    	     #
 ######################################
 
+
 -- 1 Consulta que busca en la matriz "autores"
 
 db.libros.find({ autores: "Gabriel García Márquez" });
@@ -199,6 +200,7 @@ db.libros.find({ autores: "Gabriel García Márquez" });
 -- Indice Propuesto:
 
 db.libros.createIndex({autores: 1});
+
 
 -- 2 Queremos hacer una consulta para encontrar todos los libros que tienen "Gabriel García Márquez" como autor y año.
 
@@ -211,6 +213,20 @@ db.libros.createIndex({anioPublicacion: 1, autores: 1});
 -- En este caso he determinado la creación de un indice compuesto que a su vez es multiclave al indexar un campo matriz que en este caso es "autores", priorizando el campo "anioPublicacion" para mayor selectividad.
 
 
+
+-- 3 Queremos encontrar todos los libros que son de género "Ficción" y tienen como autores a "Gabriel García Márquez" o "Roberto Bolaño". 
+Además, queremos que los resultados estén ordenados por anioPublicacion en orden descendente y limitados a los primeros 5 resultados.
+
+db.libros.find({
+  genero: "Ficción",
+  autores: { $in: ["Gabriel García Márquez", "Roberto Bolaño"] }
+}).sort({ anioPublicacion: -1 }).limit(5);
+
+-- Indice Propuesto:
+
+db.libros.createIndex({autores: 1, genero: 1, anioPublicacion: -1});
+
+-- Para este indice he priorizado primero a los "autores" antes que al "genero", ya que realizando una consulta más general como "db.libros.find();" noto que esta el mismo género presente en los documentos ( el de "Ficción", y son 5 en total ), sin embargo, para el resultado de la consulta a optimizar y tambien al hacer una busqueda general, los autores resultan más exclusivos. Al final del indice simplemente se indicará la ordenación descendente por el año de publicación.
 
 
 
