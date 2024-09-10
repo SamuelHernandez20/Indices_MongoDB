@@ -164,6 +164,52 @@ De este modo se indexarian solo los documentos que se corresponden con el campo 
 "{ "_id" : ObjectId("56e8401b010d418cf416c326"), "nombre" : "diego", "edad" : "35" }"
 --------------------------------------------------------------------------------------
 
+######################################
+#    Indices Compuestos Avanzados    #
+######################################
+
+-- 10 Queremos hacer una consulta que devuelva productos de la categoría Electrónica, que sean de la Marca A, cuyo precio esté entre $100 y $1000, 
+y que tengan más de 20 unidades en stock. Además, queremos que los resultados estén ordenados por el campo ventas en orden descendente, y vamos a implementar una paginación 
+(suponiendo que queremos los primeros 20 resultados de la página 1).
+
+db.productos.find({
+  "categoria": "Electrónica",
+  "marca": "Marca A",
+  "precio": { $gte: 100, $lte: 1000 },
+  "stock": { $gt: 20 }
+}).sort({ "ventas": -1 }).skip(0).limit(20);
+
+-- Indice Propuesto:
+
+db.productos.createIndex({categoria: 1, marca: 1, precio: 1, stock: 1, ventas: -1});
+
+-- El orden en la creación de indices compuestos es determinante en cuanto a la eficiencia y rendimiento, a la hora de crear indices hay que tener en cuenta el orden de selectividad
+   y analizar si se debe modificar el orden de los campos para priorizar otro que sea más selectivo ( posea mayor cantidad de valores únicos, y por tanto devuelve menos documentos ).
+   Para este caso el volumen de datos no es considerablemente grande, y el rango de precios en la consulta (100 - 1000) no es tampoco excesivamente amplio, por lo que el indice propuesto para este caso
+   debería ser apropiado.
+
+######################################
+#    Indices Multiclave    	     #
+######################################
+
+-- 1 Consulta que busca en la matriz "autores"
+
+db.libros.find({ autores: "Gabriel García Márquez" });
+
+-- Indice Propuesto:
+
+db.libros.createIndex({autores: 1});
+
+-- 2 Queremos hacer una consulta para encontrar todos los libros que tienen "Gabriel García Márquez" como autor y año.
+
+db.libros.find({ anioPublicacion: 1985, autores: "Gabriel García Márquez" });
+
+-- Indice Propuesto:
+
+db.libros.createIndex({anioPublicacion: 1, autores: 1});
+
+-- En este caso he determinado la creación de un indice compuesto que a su vez es multiclave al indexar un campo matriz que en este caso es "autores", priorizando el campo "anioPublicacion" para mayor selectividad.
+
 
 
 
