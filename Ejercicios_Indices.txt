@@ -228,7 +228,17 @@ db.libros.createIndex({autores: 1, genero: 1, anioPublicacion: -1});
 
 -- Para este indice he priorizado primero a los "autores" antes que al "genero", ya que realizando una consulta más general como "db.libros.find();" noto que esta el mismo género presente en los documentos ( el de "Ficción", y son 5 en total ), sin embargo, para el resultado de la consulta a optimizar y tambien al hacer una busqueda general, los autores resultan más exclusivos. Al final del indice simplemente se indicará la ordenación descendente por el año de publicación.
 
+-- 4 Consulta más elaborada con multiples campos como matriz.
 
+db.libros.find({ autores: { $in: ["Gabriel García Márquez", "Carlos Ruiz Zafón"] }, genero: { $in: ["Ficción", "Novela"] }, anioPublicacion: { $in: [1985, 2001] }
+}).sort({ anioPublicacion: -1 }).limit(3);
+
+
+-- Indice Propuesto:
+
+db.libros.createIndex({ autores: 1, genero: 1, anioPublicacion: -1});
+
+-- En caso de que el conjunto de datos creciera y las necesidades cambiaran, se podría considerar la implementación de un orden distinto en cuanto a los campos del índice.
 
 
 
