@@ -1,0 +1,70 @@
+-- Los Indices Parciales:
+
+Los índices parciales solo indexan los documentos de una colección que cumplen una expresión de filtro específica. 
+Al indexar un subconjunto de los documentos de una colección, los índices parciales tienen menores requisitos de almacenamiento 
+y costos de rendimiento reducidos para la creación y el mantenimiento de índices.
+
+
+-- Creación de coleccion e inserción de datos:
+
+db.clients.insertMany([
+    { nombre: "Ana", edad: 28, ciudad: "Madrid", activo: true },
+    { nombre: "Carlos", edad: 34, ciudad: "Barcelona", activo: false },
+    { nombre: "Juan", edad: 45, ciudad: "Sevilla", activo: true },
+    { nombre: "Sofia", edad: 30, ciudad: "Madrid", activo: true },
+    { nombre: "Luis", edad: 22, ciudad: "Barcelona", activo: false },
+    { nombre: "Marta", edad: 25, ciudad: "Valencia", activo: true }
+]);
+
+-- 1 Crea un índice solo para los documentos en los que el campo activo sea "true". De esta manera, 
+las consultas que busquen solo usuarios activos serán más rápidas, ya que no se indexarán los documentos inactivos.
+
+db.clients.createIndex(
+   { ciudad: 1 },
+   { partialFilterExpression: { activo: true  } }
+);
+
+-- 2 Crea un índice que solo incluye a los clientes mayores de 30 años. Esto es útil si realizas consultas frecuentes sobre clientes en este rango de edad.
+
+db.clients.createIndex(
+   { nombre: 1 },
+   { partialFilterExpression: { edad: { $gt: 30 } } }
+);
+
+-- 3 Crea un índice para los clientes que residen en Barcelona, ya que las consultas sobre esta ciudad son frecuentes en tu aplicación.
+
+db.clients.createIndex(
+   { edad: 1 },
+   { partialFilterExpression: { ciudad: "Barcelona" }}
+);
+
+-- 4 Crea un índice parcial que incluya tanto la ciudad como si el cliente está activo, para optimizar las búsquedas en las que necesitas filtrar por ambos criterios.
+
+db.clients.createIndex(
+   { ciudad: 1, edad: 1 },
+   { partialFilterExpression: { activo: true, ciudad: "Barcelona" }}
+);
+
+-- 5 Crea un índice parcial que optimiza las consultas para encontrar clientes activos que vivan en Valencia y tengan una edad mayor de 20 años. 
+     El índice solo debe considerar aquellos clientes que cumplen con estos criterios.
+
+db.clients.createIndex(
+   { nombre: 1, edad: 1 },
+   { partialFilterExpression: { activo: true, ciudad: "Valencia", edad: { $gt: 20 } }}
+);
+
+
+-- 6 Para clientes mayores de 40 años y no activos (activo: false), crea un índice parcial en los campos ciudad y nombre. El filtrado será sobre aquellos clientes inactivos y con edad superior a 40.
+
+db.clients.createIndex(
+   { ciudad: 1, nombre: 1 },
+   { partialFilterExpression: { activo: false, edad: { $gt: 40 } }}
+);
+
+-- 7 Para clientes menores de 35 años y activos (activo: true), crea un índice parcial en los campos ciudad y edad. El filtrado será para clientes menores de 35 años y activos.
+
+db.clients.createIndex(
+   { ciudad: 1, edad: 1 },
+   { partialFilterExpression: { activo: true, edad: { $lt: 35 } }}
+);
+
