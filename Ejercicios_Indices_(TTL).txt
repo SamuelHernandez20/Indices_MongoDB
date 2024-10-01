@@ -39,18 +39,18 @@ como contenido generado por el usuario, como actualizaciones de estado o archivo
 
 Ejercicios:
 
-1. Crear un índice TTL para eliminar documentos después de 1 hora.
+-- 1. Crear un índice TTL para eliminar documentos después de 1 hora.
 
 db.eventos.createIndex( { "fecha_creacion": 1 }, { expireAfterSeconds: 3600 } );
 
 
-2. Crea un índice TTL para que los documentos de la colección eventos sean eliminados automáticamente 1 hora después de su fecha de creación.
+-- 2. Crea un índice TTL para que los documentos de la colección eventos sean eliminados automáticamente 1 hora después de su fecha de creación.
 Verificar el índice TTL creado.
 
 db.eventos.createIndex( { "fecha_creacion": 1 }, { expireAfterSeconds: 3600 } );
 db.eventos.getIndexes();
 
-3. Consulta los índices creados en la colección eventos para verificar que el índice TTL está correctamente configurado.
+-- 3. Consulta los índices creados en la colección eventos para verificar que el índice TTL está correctamente configurado.
 Modificar el tiempo de vida del índice TTL.
 
 db.eventos.getIndexes();
@@ -64,7 +64,7 @@ db.runCommand({
 });
 
 
-4. Cambia el TTL existente para que los documentos expiren a las 24 horas en lugar de 1 hora.
+-- 4. Cambia el TTL existente para que los documentos expiren a las 24 horas en lugar de 1 hora.
 Eliminar el índice TTL.
 
 db.runCommand({
