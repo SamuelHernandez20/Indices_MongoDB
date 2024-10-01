@@ -1,0 +1,107 @@
+El índice TTL es un con un valor "expireAfterSeconds". 
+El comando del ejemplo posterior creará un índice con la funcionalidad TTL.
+
+- Ejemplo:
+
+db.eventlog.createIndex( { "lastModifiedDate": 1 }, { expireAfterSeconds: 3600 } ); 
+
+Este tipo de índices son útiles cuando se busca cubrir una necesidad temporal y que luego
+estos sean eliminados de la base de datos, evitando así el almacenado de índices redundantes
+y saturaciones innecesarias de memoria.
+
+
+
+--------------------------------------------------------------------------------------------------
+- Algunos casos de uso práctico son:
+--------------------------------------------------------------------------------------------------
+
+1. Registro y auditoría : 
+
+Los archivos de registro o las pistas de auditoría suelen tener un período de retención limitado, 
+después del cual los datos se vuelven irrelevantes y pueden eliminarse.
+
+2. Gestión de sesiones : 
+
+Los datos de sesión en aplicaciones web normalmente tienen una vida útil limitada, 
+y los índices TTL pueden ayudar a administrar y eliminar sesiones vencidas automáticamente.
+
+3. Almacenamiento en caché : 
+
+Los datos almacenados en caché suelen tener un período de validez limitado, 
+y los índices TTL pueden ayudar a garantizar que los datos almacenados en caché obsoletos se eliminen automáticamente.
+
+4. Almacenamiento temporal de datos : 
+
+En algunos casos, es posible que necesite almacenar datos temporales que tengan un tiempo de vencimiento definido, 
+como contenido generado por el usuario, como actualizaciones de estado o archivos temporales.
+
+--------------------------------------------------------------------------------------------------
+
+Ejercicios:
+
+1. Crear un índice TTL para eliminar documentos después de 1 hora.
+
+db.eventos.createIndex( { "fecha_creacion": 1 }, { expireAfterSeconds: 3600 } );
+
+
+2. Crea un índice TTL para que los documentos de la colección eventos sean eliminados automáticamente 1 hora después de su fecha de creación.
+Verificar el índice TTL creado.
+
+db.eventos.createIndex( { "fecha_creacion": 1 }, { expireAfterSeconds: 3600 } );
+db.eventos.getIndexes();
+
+3. Consulta los índices creados en la colección eventos para verificar que el índice TTL está correctamente configurado.
+Modificar el tiempo de vida del índice TTL.
+
+db.eventos.getIndexes();
+
+db.runCommand({
+   collMod: "eventos",
+   index: {
+      keyPattern: { "fecha_creacion": 1 }, 
+      expireAfterSeconds: 4600               
+   }
+});
+
+
+4. Cambia el TTL existente para que los documentos expiren a las 24 horas en lugar de 1 hora.
+Eliminar el índice TTL.
+
+db.runCommand({
+   collMod: "eventos",
+   index: {
+      keyPattern: { "fecha_creacion": 1 }, 
+      expireAfterSeconds: 86400             
+   }
+});
+
+db.eventos.getIndexes();
+
+db.eventos.dropIndex('fecha_creacion_1');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
