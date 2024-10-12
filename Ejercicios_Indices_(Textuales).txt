@@ -51,4 +51,47 @@ Este comando buscará en la colección `books` todas las entradas que contengan 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
--- 1 
+
+1. Buscar libros por palabras clave en el título y resumen: Crea un índice textual para los campos "titulo" y "resumen" de la colección libros. 
+Realiza una búsqueda para encontrar todos los libros que mencionen las palabras clave "caballero" o "anillo".
+
+db.libros.createIndex({titulo: "text", resumen: "text"});
+
+db.libros.find({$text: {$search: "caballero anillo"}});
+
+
+2. Filtrar películas por director y sinopsis: Crea un índice textual para los campos director y sinopsis en la colección peliculas. 
+Realiza una consulta que encuentre películas dirigidas por "Nolan" o que en su sinopsis mencionen "astronautas".
+
+db.peliculas.createIndex({director: "text", sinopsis: "text"});
+
+db.peliculas.find({$text: {$search: "Nolan astronautas"}});
+
+
+3. Priorizar la búsqueda por título de libros: Crea un índice textual en la colección libros con una ponderación mayor para el campo titulo en comparación con resumen. 
+Realiza una búsqueda para encontrar libros que contengan la palabra "aventura" en cualquier campo, priorizando los títulos.
+
+db.libros.createIndex(
+{titulo: "text", resumen: "text"}, 
+{ weights: { titulo: 5, resumen: 1}}); <-- "weights" se utiliza para asignar puntuaciones, la cual se encarga de indicar la relevancia del campo de un documento. 
+
+db.libros.find({$text: {$search: "aventura"}});
+
+
+4. Búsqueda de películas en varios géneros: Crea un índice textual para los campos genero y sinopsis en peliculas. 
+Realiza una consulta para encontrar todas las películas que pertenezcan al género "Ciencia Ficción" o mencionen la palabra "simulación" en la sinopsis.
+
+db.peliculas.createIndex({genero: "text", sinopsis: "text"});
+db.peliculas.find({$text: {$search: "Ciencia Ficción simulación" }});
+
+
+5. Búsqueda exacta en títulos de libros: Usa un índice textual para buscar en la colección libros los títulos que coincidan exactamente con una frase, por ejemplo, "Cien Años de Soledad". 
+Configura la consulta para que solo devuelva resultados si la coincidencia es exacta en el título.
+
+db.libros.find({ $text: { $search: "\"Cien Años de Soledad\"" } }); <-- Con las comillas dobles, MongoDB buscará una coincidencia exacta de esa frase en los campos indexados, en este caso, en el título del libro.
+
+6. Busca todas las películas que tengan el término "ciencia ficción" en su género, pero que no hagan referencia a "simulación".
+
+db.peliculas.createIndex({genero: "text", sinopsis: "text"});
+
+db.peliculas.find({$text: {$search: "ciencia ficción -simulación" }});
