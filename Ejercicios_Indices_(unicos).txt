@@ -1,0 +1,62 @@
+-- Se tiene una colección llamada "users" con la siguiente información de usuarios insertada masivamente, 
+   donde se desean crear índices únicos para garantizar que los valores indexados sean únicos para cada documento:
+
+" db.usuarios.insertMany([
+  {
+    nombre: "Juan Pérez",
+    email: "juan.perez@example.com",
+    username: "juanperez",
+    edad: 30
+  },
+  {
+    nombre: "María García",
+    email: "maria.garcia@example.com",
+    username: "mariagarcia",
+    edad: 25
+  },
+  {
+    nombre: "Carlos López",
+    email: "carlos.lopez@example.com",
+    username: "carloslopez",
+    edad: 35
+  }
+]);  "
+
+--1 Queremos asegurarnos de que el campo email sea único, ya que cada usuario debe tener un correo electrónico único en la aplicación. 
+   Crear un índice único en el campo "email" y prueba insertar un nuevo usuario con el mismo correo electrónico que uno existente para ver qué sucede.
+
+
+-- Indice Propuesto:
+
+db.users.createIndex({ email: 1 }, { unique: true });
+
+-- Resultado de insertar un usuario con un valor duplicado en el campo indexado de forma única:
+
+MongoServerError: E11000 duplicate key error collection: users.users index: email_1 dup key: { email: "juan.perez@example.com" }
+
+
+-- 2 Además de los correos electrónicos, los nombres de usuario (username) también deben ser únicos en nuestra aplicación.
+     Crear un índice único en el campo username para evitar duplicados. Intenta insertar un documento con un username duplicado y observa el resultado.
+
+
+-- Indice Propuesto:
+
+db.users.createIndex({ username: 1 }, { unique: true });
+
+-- Resultado de insertar un usuario con un valor duplicado en el campo indexado de forma única:
+
+MongoServerError: E11000 duplicate key error collection: users.users index: username_1 dup key: { username: "samuelhernandez" }
+
+-- 3 Imagina que necesitamos que la combinación de "email" y "username" sea única en la aplicación, de modo que no haya dos usuarios con el mismo correo o el mismo nombre de usuario.
+     Crear un índice compuesto único en los campos "email" y "username". Prueba insertar un usuario con un email ya existente pero con un nombre de usuario diferente, y viceversa.
+
+-- Indice Propuesto:
+
+db.users.createIndex({ email: 1, username: 1 }, { unique: true });
+
+-- Resultado de insertar un usuario con valores duplicados en los campos indexados de forma única:
+
+MongoServerError: E11000 duplicate key error collection: users.users index: username_1 dup key: { username: "mariagarcia" }
+
+-- Nota adicional: En el caso de los Indices únicos Compuestos, con que uno de los campos se duplique ya lanzará el error aunque el otro posea un valor no repetido.
+
