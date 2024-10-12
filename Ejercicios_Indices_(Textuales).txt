@@ -1,0 +1,54 @@
+################################
+# Sobre los Indices Textuales  #
+################################
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Los índices de texto admiten consultas de búsqueda de texto en campos que contienen contenido de cadena. 
+Los índices de texto mejoran el rendimiento al buscar palabras o frases específicas dentro del contenido de una cadena. 
+Una colección sólo puede tener un índice de texto, pero ese índice puede incluir varios campos.
+
+1. ¿Por qué utilizar índices de texto en MongoDB?
+
+La razón principal para utilizar índices de texto en MongoDB es para permitir búsquedas de texto completo en una colección. 
+Cuando se buscan datos en un campo de texto, no es suficiente buscar solo una coincidencia exacta. 
+En cambio, se necesita la capacidad de buscar una cadena de texto en todos los documentos de una colección y devolver los documentos que contengan esa cadena. 
+Sin un índice de texto, la base de datos tiene que escanear todos los documentos de la colección para encontrar coincidencias, lo que puede ser extremadamente ineficiente en colecciones grandes. 
+Con un índice de texto, la base de datos puede realizar búsquedas de texto completo de manera mucho más eficiente.
+
+2. Creación de un índice de texto en MongoDB
+
+Crear un índice de texto en MongoDB es bastante sencillo. Primero, debemos seleccionar la colección y el campo de texto en el que queremos crear el índice. 
+Luego, utilizamos el método `createIndex()` para crear el índice. Por ejemplo, supongamos que tenemos una colección llamada `books` y queremos crear un índice de texto en el campo `title`. 
+Podríamos hacerlo de la siguiente manera: ``` db.books.createIndex({title: "text"}) ``` 
+Este comando creará un índice de texto en el campo `title` de la colección `books`. 
+El segundo argumento, `"text"`, indica que se trata de un índice de texto.
+
+
+3. Búsquedas con múltiples términos
+
+En ocasiones, es posible que queramos buscar varios términos en un campo de texto. 
+Por ejemplo, podríamos querer buscar todas las entradas de la colección que contengan las palabras "mongodb" y "programación". 
+Para realizar una búsqueda con múltiples términos, simplemente separamos los términos con un espacio en la cadena de búsqueda. 
+Por ejemplo: ``` db.books.find({$text: {$search: "mongodb programación"}}) ``` 
+Este comando buscará en la colección `books` todas las entradas que contengan tanto "mongodb" como "programación" en el campo `title`.
+
+4. Búsquedas con frases exactas
+
+En algunos casos, puede ser que queramos buscar una frase exacta en un campo de texto en lugar de palabras individuales. 
+Para realizar una búsqueda con frases exactas en MongoDB, simplemente encerramos la frase entre comillas dobles en la cadena de búsqueda. 
+Por ejemplo, supongamos que queremos buscar todas las entradas en la colección que contengan la frase exacta "programación en mongodb". 
+Podemos hacerlo de la siguiente manera: ``` db.books.find({$text: {$search: ""programación en mongodb""}}) ``` 
+Este comando buscará en la colección `books` todas las entradas que contengan la frase exacta "programación en mongodb" en el campo `title`.
+
+
+5. Búsquedas con exclusión de términos
+
+Finalmente, es posible que queramos buscar todas las entradas que contengan un término específico pero que excluyan otro término. 
+Para realizar una búsqueda de exclusión en MongoDB, simplemente precedemos el término que queremos excluir con un signo menos (-) en la cadena de búsqueda. 
+Por ejemplo, supongamos que queremos buscar todas las entradas en la colección que contengan el término "mongodb" pero que excluyan el término "programación". 
+Podemos hacerlo de la siguiente manera: ``` db.books.find({$text: {$search: "mongodb -programación"}}) ``` 
+Este comando buscará en la colección `books` todas las entradas que contengan la palabra "mongodb" en el campo `title` pero que excluyan el término "programación".
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- 1 
